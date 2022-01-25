@@ -9,26 +9,13 @@ if (selection.length > 1){
   const height = selection[0].height
   figma.parameters.on('input', ({ parameters, key, query, result }: ParameterInputEvent) => {
     switch (key) {
-      case 'dimension':
-        const dimensions = ['width', 'height']
-        result.setSuggestions(dimensions.filter(s => s.includes(query)))
+      case 'width':
+        const widths = [width + "l"]
+        result.setSuggestions(widths.filter(s => s.includes(query)))
         break
-      case 'value':
-        const values = [width.toString(), height.toString()]
-        result.setSuggestions(values.filter(s => s.includes(query)))
-        break
-      case 'direction':
-        const horizontalDirections = [
-          {name: 'left', metadata: "l"},
-          {name: 'center', metadata: "c"},
-          {name: 'right', metadata: "r"}
-        ]
-        const verticalDirections = [
-          {name: 'top', metadata: "t"},
-          {name: 'center', metadata: "c"},
-          {name: 'bottom', metadata: "b"}
-        ]
-        result.setSuggestions((parameters.dimension == "width" ? horizontalDirections : verticalDirections).filter(s => s.name.includes(query)))
+      case 'height':
+        const heights = [width + "t"]
+        result.setSuggestions(heights.filter(s => s.includes(query)))
         break
       default:
         return
@@ -39,9 +26,9 @@ if (selection.length > 1){
     switch (command) {
       case "":
         if (parameters) {
+          //TODO: do all the parsing and splitting
           let horizontalDirection = "l"
           let verticalDirection = "t"
-          parameters.dimension == 
           resize( width, horizontalDirection, height, verticalDirection )
         } else {
           figma.showUI(__html__)

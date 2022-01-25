@@ -10,20 +10,14 @@
   "parameterOnly": false, 
   "parameters": [
     {
-      "name": "dimension",
-      "key": "dimension",
-      "allowFreeform": false
-    },
-    {
-      "name": "value",
-      "key": "value",
+      "name": "width",
+      "key": "width",
       "allowFreeform": true
     },
     {
-      "name": "direction",
-      "key": "direction",
-      "allowFreeform": false,
-      "optional": true
+      "name": "height",
+      "key": "height",
+      "allowFreeform": true
     }
   ]
 }
