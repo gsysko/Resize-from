@@ -14,7 +14,7 @@ if (selection.length > 1){
         result.setSuggestions(widths.filter(s => s.includes(query)))
         break
       case 'height':
-        const heights = [width + "t"]
+        const heights = [height + "t"]
         result.setSuggestions(heights.filter(s => s.includes(query)))
         break
       default:
@@ -26,10 +26,23 @@ if (selection.length > 1){
     switch (command) {
       case "":
         if (parameters) {
-          //TODO: do all the parsing and splitting
+          let newWidth = parseInt(parameters.width, 10)
           let horizontalDirection = "l"
+          if (parameters.width.search(/\d*c/i) == 0) {
+            horizontalDirection = "c"
+          } else if (parameters.width.search(/\d*r/i) == 0) {
+            horizontalDirection = "r"
+          }
+
+          let newHeight = parseInt(parameters.height, 10)
           let verticalDirection = "t"
-          resize( width, horizontalDirection, height, verticalDirection )
+          if (parameters.height.search(/\d*c/i) == 0) {
+            verticalDirection = "c"
+          } else if (parameters.height.search(/\d*b/i) == 0) {
+            verticalDirection = "b"
+          }
+
+          resize( newWidth, horizontalDirection, newHeight, verticalDirection )
         } else {
           figma.showUI(__html__)
           figma.ui.resize(300, 144)
