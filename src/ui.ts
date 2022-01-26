@@ -21,10 +21,10 @@ window.onmessage = async (event) => {
   //...if it is a request to populate the dimension fields...
   if (event.data.pluginMessage.type === 'setSize') {
     const widthTextbox = document.getElementById('input_width') as HTMLInputElement
-    widthTextbox.value = event.data.pluginMessage.width
+    widthTextbox.value = event.data.pluginMessage.width ? event.data.pluginMessage.width : "Mixed"
     widthTextbox.select()
     const heightTextbox = document.getElementById('input_height') as HTMLInputElement
-    heightTextbox.value = event.data.pluginMessage.height
+    heightTextbox.value = event.data.pluginMessage.height ? event.data.pluginMessage.height : "Mixed"
   }
 }
 

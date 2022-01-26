@@ -1,57 +1,77 @@
 
 const selection = figma.currentPage.selection
-if (selection.length > 1){
-  figma.closePlugin("Select only one item")
-} else if (selection.length < 1){
-  figma.closePlugin("Select at least one item")
-}  else {
-  const width = selection[0].width
-  const height = selection[0].height
-  figma.parameters.on('input', ({ parameters, key, query, result }: ParameterInputEvent) => {
-    switch (key) {
-      case 'width':
-        const widths = [width + "l"]
-        result.setSuggestions(widths.filter(s => s.includes(query)))
-        break
-      case 'height':
-        const heights = [height + "t"]
-        result.setSuggestions(heights.filter(s => s.includes(query)))
-        break
-      default:
-        return
+debugger
+if (selection.length) {
+  var width = selection[0].width
+  var height = selection[0].height
+
+  selection.forEach(selectItem => {
+    if (selectItem.width != width){
+      width = null
     }
-  })
-
-  figma.on('run', ({ command, parameters }: RunEvent) => {
-    switch (command) {
-      case "":
-        if (parameters) {
-          let newWidth = parseInt(parameters.width, 10)
-          let horizontalDirection = "l"
-          if (parameters.width.search(/\d*c/i) == 0) {
-            horizontalDirection = "c"
-          } else if (parameters.width.search(/\d*r/i) == 0) {
-            horizontalDirection = "r"
-          }
-
-          let newHeight = parseInt(parameters.height, 10)
-          let verticalDirection = "t"
-          if (parameters.height.search(/\d*c/i) == 0) {
-            verticalDirection = "c"
-          } else if (parameters.height.search(/\d*b/i) == 0) {
-            verticalDirection = "b"
-          }
-
-          resize( newWidth, horizontalDirection, newHeight, verticalDirection )
-        } else {
-          figma.showUI(__html__)
-          figma.ui.resize(300, 144)
-          figma.ui.postMessage({ type: 'setSize' , width: width, height: height })
-          break
-        }
+    if (selectItem.height != height){
+      height = null
     }
   })
 }
+
+figma.parameters.on('input', ({ parameters, key, query, result }: ParameterInputEvent) => {
+  switch (key) {
+    case 'width':
+      const widths = [width + "l"]
+      if (width) {
+        result.setSuggestions(widths.filter(s => s.includes(query)))
+      } else {
+        result.setLoadingMessage("Mixed")
+      }
+      break
+    case 'height':
+      const heights = [height + "t"]
+      if (height) {
+        result.setSuggestions(heights.filter(s => s.includes(query)))
+      } else {
+        result.setLoadingMessage("Mixed")
+      }
+      break
+    default:
+      return
+  }
+})
+
+figma.on('run', ({ command, parameters }: RunEvent) => {
+  if (selection.length < 1) {
+    figma.closePlugin("Select at least one item")
+    return
+  }
+  debugger
+  switch (command) {
+    case "":
+      if (parameters) {
+        let newWidth = parseInt(parameters.width, 10)
+        let horizontalDirection = "l"
+        if (parameters.width.search(/\d*c/i) == 0) {
+          horizontalDirection = "c"
+        } else if (parameters.width.search(/\d*r/i) == 0) {
+          horizontalDirection = "r"
+        }
+
+        let newHeight = parseInt(parameters.height, 10)
+        let verticalDirection = "t"
+        if (parameters.height.search(/\d*c/i) == 0) {
+          verticalDirection = "c"
+        } else if (parameters.height.search(/\d*b/i) == 0) {
+          verticalDirection = "b"
+        }
+
+        resize( newWidth, horizontalDirection, newHeight, verticalDirection )
+      } else {
+        figma.showUI(__html__)
+        figma.ui.resize(300, 144)
+        figma.ui.postMessage({ type: 'setSize' , width: width, height: height })
+        break
+      }
+  }
+})
 
 figma.ui.onmessage = msg => {
   if (msg.type === 'resize') {
@@ -59,6 +79,7 @@ figma.ui.onmessage = msg => {
   }
 }
 
+//TODO need to account for when height/width is "Mixed" (or other NaN)
 function resize(width: number, horizontalDirection: string, height: number, verticalDirection: string) {
   let deltaH = selection[0].width - width
   let deltaV = selection[0].height - height
