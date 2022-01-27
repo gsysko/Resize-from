@@ -1,6 +1,5 @@
 
 const selection = figma.currentPage.selection
-debugger
 if (selection.length) {
   var width = selection[0].width
   var height = selection[0].height
@@ -22,7 +21,7 @@ figma.parameters.on('input', ({ parameters, key, query, result }: ParameterInput
       if (width) {
         result.setSuggestions(widths.filter(s => s.includes(query)))
       } else {
-        result.setLoadingMessage("Mixed")
+        result.setSuggestions(["Mixed"])
       }
       break
     case 'height':
@@ -30,7 +29,7 @@ figma.parameters.on('input', ({ parameters, key, query, result }: ParameterInput
       if (height) {
         result.setSuggestions(heights.filter(s => s.includes(query)))
       } else {
-        result.setLoadingMessage("Mixed")
+        result.setSuggestions(["Mixed"])
       }
       break
     default:
@@ -43,7 +42,6 @@ figma.on('run', ({ command, parameters }: RunEvent) => {
     figma.closePlugin("Select at least one item")
     return
   }
-  debugger
   switch (command) {
     case "":
       if (parameters) {
@@ -81,44 +79,50 @@ figma.ui.onmessage = msg => {
 
 //TODO need to account for when height/width is "Mixed" (or other NaN)
 function resize(width: number, horizontalDirection: string, height: number, verticalDirection: string) {
-  let deltaH = selection[0].width - width
-  let deltaV = selection[0].height - height
-  switch(selection[0].type){
-    case "BOOLEAN_OPERATION" :
-    case "COMPONENT" :
-    case "COMPONENT_SET" :
-    case "ELLIPSE" :
-    case "FRAME" :
-    case "GROUP" :
-    case "INSTANCE" :
-    case "LINE" :
-    case "POLYGON" :
-    case "RECTANGLE" :
-    case "SHAPE_WITH_TEXT" :
-    case "SLICE" :
-    case "STAMP" :
-    case "STAR" :
-    case "TEXT" :
-    case "VECTOR":
-      selection[0].resize(width, height)
-      switch(horizontalDirection){
-        case "c":
-          selection[0].x = selection[0].x + deltaH/2
-          break
-        case "r":
-          selection[0].x = selection[0].x + deltaH
-          break
-      }
-      switch(verticalDirection){
-        case "c":
-          selection[0].y = selection[0].y + deltaV/2
-          break
-        case "b":
-          selection[0].y = selection[0].y + deltaV
-          break
-      }
-      break
-  }
-
+  selection.forEach(selected => {
+    let deltaH = selected.width - width
+    let deltaV = selected.height - height
+    switch(selected.type){
+      case "BOOLEAN_OPERATION" :
+      case "COMPONENT" :
+      case "COMPONENT_SET" :
+      case "ELLIPSE" :
+      case "FRAME" :
+      case "GROUP" :
+      case "INSTANCE" :
+      case "LINE" :
+      case "POLYGON" :
+      case "RECTANGLE" :
+      case "SHAPE_WITH_TEXT" :
+      case "SLICE" :
+      case "STAMP" :
+      case "STAR" :
+      case "TEXT" :
+      case "VECTOR":
+        if (width) {
+          selected.resize(width, selected.height)
+          switch(horizontalDirection){
+            case "c":
+              selected.x = selected.x + deltaH/2
+              break
+            case "r":
+              selected.x = selected.x + deltaH
+              break
+          }
+        }
+        if (height) {
+          selected.resize(selected.width, height)
+          switch(verticalDirection){
+            case "c":
+              selected.y = selected.y + deltaV/2
+              break
+            case "b":
+              selected.y = selected.y + deltaV
+              break
+          }
+        }
+        break
+    }
+  })
   figma.closePlugin()
 }
