@@ -1,3 +1,6 @@
+var stringMath = require('string-math');
+const reLetters = /[A-Za-z]/g
+
 //Get current selection
 const selection = figma.currentPage.selection
 //If anything is selected...
@@ -62,24 +65,33 @@ figma.on('run', ({ command, parameters }: RunEvent) => {
     case "":
       //If command comes from quick action...
       if (parameters) {
+        //Todo should probably refactor this to use the same logic as in ui.ts
         //Convert from string -> number
-        let newWidth = parseInt(parameters.width, 10)
+        try {
+          var newWidth = stringMath(parameters.width.replaceAll(reLetters, ""))
+        } catch (error) {
+          newWidth = parseInt(parameters.width, 10)
+        }
         //Initialize a horizontal resize direction
         let horizontalDirection = "l"
         //Change the direction if a different letter is found
-        if (parameters.width.search(/\d*c/i) == 0) {
+        if (parameters.width.search(/\d*c/i) != -1) {
           horizontalDirection = "c"
-        } else if (parameters.width.search(/\d*r/i) == 0) {
+        } else if (parameters.width.search(/\d*r/i) != -1) {
           horizontalDirection = "r"
         }
         //Convert from string -> number
-        let newHeight = parseInt(parameters.height, 10)
+        try {
+          var newHeight = stringMath(parameters.height.replaceAll(reLetters, ""))
+        } catch (error) {
+          newHeight = parseInt(parameters.height, 10)
+        }
         //Initialize a verical resize direction
         let verticalDirection = "t"
         //Change the direction if a different letter is found
-        if (parameters.height.search(/\d*c/i) == 0) {
+        if (parameters.height.search(/\d*c/i) != -1) {
           verticalDirection = "c"
-        } else if (parameters.height.search(/\d*b/i) == 0) {
+        } else if (parameters.height.search(/\d*b/i) != -1) {
           verticalDirection = "b"
         }
 
