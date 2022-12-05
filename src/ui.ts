@@ -84,7 +84,6 @@ function resize() {
   } catch (error) {
     height = NaN
   }
-  debugger
   let verticalDirection = "t"
   if (heightTextbox.value.search(/\d*c/i) != -1) {
     verticalDirection = "c"

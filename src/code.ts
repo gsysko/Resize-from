@@ -175,6 +175,46 @@ function resize(width: number, horizontalDirection: string, height: number, vert
           }
         }
         break
+      case "SECTION" :
+        //If width is a number (i.e. not NaN because it is "Mixed")...
+        if (width) {
+          //Resize its width
+          selected.resizeWithoutConstraints(width, selected.height)
+          switch(horizontalDirection){
+            //If it should remain centered...
+            case "c":
+              //Shift its position to offset the width change.
+              selected.x = selected.x + deltaH/2
+              selected.children.forEach(node => node.x = node.x - deltaH/2)
+              break
+            //If it should remain right aligned...
+            case "r":
+              //Shift its position to offset the width change.
+              selected.x = selected.x + deltaH
+              selected.children.forEach(node => node.x = node.x - deltaH)
+              break
+          }
+        }
+        //If height is a number (i.e. not NaN because it is "Mixed")...
+        if (height) {
+          //Resize its height
+          selected.resizeWithoutConstraints(selected.width, height)
+          switch(verticalDirection){
+            //If it should remain centered...
+            case "c":
+              //Shift its position to offset the height change.
+              selected.y = selected.y + deltaV/2
+              selected.children.forEach(node => node.y = node.y - deltaV/2)
+              break
+            //If it should remain bottom aligned...
+            case "b":
+              //Shift its position to offset the height change.
+              selected.y = selected.y + deltaV
+              selected.children.forEach(node => node.y = node.y - deltaV)
+              break
+          }
+        }
+        break
     }
   })
   //Phew! We are done.
